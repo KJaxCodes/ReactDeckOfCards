@@ -1,0 +1,14 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+body {
+  background-color: rgb(12, 105, 12);
+}
+
+h1 {
+  color: black;
+}
