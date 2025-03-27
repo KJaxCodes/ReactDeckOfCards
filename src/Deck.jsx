@@ -21,12 +21,14 @@ const Deck = () => {
     const [card, setCard] = useState(null);
     const url = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1"
 
-    //does drawCard function go here?
-
+    const drawCard = () => {
+        console.log("Drawing a card");
+    }
 
     useEffect(() => {
 
     })
+
     async function loadDeck() {
         const res = await axios.get(url);
     }
