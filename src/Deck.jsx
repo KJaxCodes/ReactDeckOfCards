@@ -19,30 +19,80 @@ import axios from "axios";
 
 const Deck = () => {
     const [card, setCard] = useState(null);
-    const url = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1"
+    const [currentDeck, setCurrentDeck] = useState({ deckId: "", remaining: 0 })
+    const loadUrl = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1";
 
-    const drawCard = () => {
+
+    const drawCard = async () => {
         console.log("Drawing a card");
+        //build the drawUrl, grab the deck Id variable from currentDeck state
+        const drawUrl = `https://deckofcardsapi.com/api/deck/${currentDeck.deckId}/draw/?count=1`;
+        //send the request to get One card
+        const { data } = await axios.get(drawUrl);
+        //destructured
+        const { image, suit, value } = data.cards[0]
+        //destructure the values in the api to use more succinctly 
+        console.log(data.cards[0]);
+        setCard({ image, suit, value });
     }
 
-    useEffect(() => {
 
-    })
 
-    async function loadDeck() {
-        const res = await axios.get(url);
+    const loadDeck = async () => {
+        console.log("Getting a brand new deck");
+        const { data } = await axios.get(loadUrl);
+        //destructured
+        const { deck_id: deckId, remaining } = data;
+        //destructure the deck_id key and reassign it to deckID
+        setCurrentDeck({ deckId, remaining })
+        //using shorthand notation in lieu of deckId: deckId, remaining: remaining
+        console.log(deckId);
     }
-    loadDeck();
-    //call the function?
 
     //how do I set the state with the card data?
 
+    //    useEffect(() => {})
+
+    // useEffect(() => {
+    //     if (card) {
+    //         console.log("new card")
+    //         console.log(card);
+    //     }
+    // }, [card])
+
+    // useEffect(() => {
+    //     loadDeck();
+    // }, []);
+
+    useEffect(() => {
+        // console.log(currentDeck.remaining)
+        if (currentDeck.remaining === 0) {
+            console.log("Error: no cards remaining!");
+            alert("Error: no cards remaining!")
+        }
+    }, [currentDeck]);
+
     return (
         <div>
-            {card}
+            {
+                card ?
+                    <div className="card-display">
+                        <p>{card.value}</p>
+                        <p>{card.suit}</p>
+                        {
+                            <img src={card.image} alt="" />
+                        }
+                    </div>
+                    :
+                    null
+            }
+
+            <button onClick={loadDeck}>Get a Deck</button>
             <button onClick={drawCard}>Draw a Card</button>
         </div>
     )
 }
 
 export default Deck;
+
+
