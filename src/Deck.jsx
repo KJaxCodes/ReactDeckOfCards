@@ -19,22 +19,32 @@ import axios from "axios";
 
 const Deck = () => {
     const [card, setCard] = useState(null);
-    const [currentDeck, setCurrentDeck] = useState({ deckId: "", remaining: 0 })
+    const [currentDeck, setCurrentDeck] = useState({ deckId: "", remaining: -1 }) //-1 used as placeholder because no remaining cards yet since no deck set
     const loadUrl = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1";
 
 
     const drawCard = async () => {
-        console.log("Drawing a card");
-        //build the drawUrl, grab the deck Id variable from currentDeck state
-        const drawUrl = `https://deckofcardsapi.com/api/deck/${currentDeck.deckId}/draw/?count=1`;
-        //send the request to get One card
-        const { data } = await axios.get(drawUrl);
-        //destructured
-        const { image, suit, value } = data.cards[0]
-        //destructure the values in the api to use more succinctly 
-        console.log(data.cards[0]);
-        setCard({ image, suit, value });
+        try {
+            console.log("Drawing a card");
+            //build the drawUrl, grab the deck Id variable from currentDeck state
+            const drawUrl = `https://deckofcardsapi.com/api/deck/${currentDeck.deckId}/draw/?count=1`;
+            //send the request to get One card
+            const { data } = await axios.get(drawUrl);
+            //destructured
+            const { remaining } = data;
+            const { image, suit, value } = data.cards[0];
+            //destructure the values in the api to use more succinctly 
+            console.log(data.cards[0]);
+            setCard({ image, suit, value });
+            setCurrentDeck(state => {
+                return { ...state, remaining }
+                //copy over the previous state so the deckId remains, only update the remaining count
+            })
+        } catch (error) {
+            alert("Error: no cards remaining! Shuffle or Get a New Deck!");
+        }
     }
+
 
 
 
@@ -49,6 +59,16 @@ const Deck = () => {
         console.log(deckId);
     }
 
+    const handleShuffle = async () => {
+        console.log("reshuffle");
+        const reshuffleUrl = `https://deckofcardsapi.com/api/deck/${currentDeck.deckId}/shuffle/`
+
+        const { data } = await axios.get(reshuffleUrl);
+        const { deck_id: deckId, remaining } = data;
+        setCard(null);
+        setCurrentDeck({ deckId, remaining });
+    }
+
     //how do I set the state with the card data?
 
     //    useEffect(() => {})
@@ -61,15 +81,18 @@ const Deck = () => {
     // }, [card])
 
     // useEffect(() => {
-    //     loadDeck();
+    //     console.log("This runs when the component initially loads")
+    //     loadDeck(); // promise which will resovle, but will not block the execution of the next code
     // }, []);
 
     useEffect(() => {
         // console.log(currentDeck.remaining)
-        if (currentDeck.remaining === 0) {
-            console.log("Error: no cards remaining!");
-            alert("Error: no cards remaining!")
-        }
+        console.log("This runs after the current deck state changes")
+        console.log(currentDeck)
+        // if (currentDeck.remaining === 0) {
+        //     console.log("Error: no cards remaining!");
+        //     alert("Error: no cards remaining!")
+        // }
     }, [currentDeck]);
 
     return (
@@ -89,6 +112,7 @@ const Deck = () => {
 
             <button onClick={loadDeck}>Get a Deck</button>
             <button onClick={drawCard}>Draw a Card</button>
+            <button onClick={handleShuffle}>Shuffle the Deck</button>
         </div>
     )
 }
