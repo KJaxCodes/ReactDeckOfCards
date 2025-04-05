@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Card from "./Card";
 
 //function called Deck that encapsulates the logic for fetching 
 //and displaying the cards from the card deck api.
@@ -99,20 +100,29 @@ const Deck = () => {
         <div>
             {
                 card ?
-                    <div className="card-display">
-                        <p>{card.value}</p>
-                        <p>{card.suit}</p>
-                        {
-                            <img src={card.image} alt="" />
-                        }
+                    <Card value={card.value} suit={card.suit} image={card.image} />
+                    :
+                    <Card />
+            }
+
+            <div>
+                <button onClick={loadDeck}>
+                    {currentDeck.deckId ? "Get a New Deck" : "Get a Deck"}
+                </button>
+            </div>
+
+            {
+                currentDeck.deckId ?
+                    <div>
+                        <button onClick={drawCard}>Draw a Card</button>
+                        <button onClick={handleShuffle}>Shuffle the Deck</button>
                     </div>
                     :
                     null
             }
 
-            <button onClick={loadDeck}>Get a Deck</button>
-            <button onClick={drawCard}>Draw a Card</button>
-            <button onClick={handleShuffle}>Shuffle the Deck</button>
+
+
         </div>
     )
 }
